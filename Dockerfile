@@ -1,23 +1,19 @@
-FROM node:20.12-alpine as build
+FROM node:18-alpine as build
 RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git > /dev/null 2>&1
 ENV NODE_ENV=production
 
 WORKDIR /opt/
 COPY package.json yarn.lock ./
-RUN yarn global add node-gyp pg
+RUN yarn global add node-gyp
 RUN yarn config set network-timeout 600000 -g && yarn install --production
-RUN yarn dev
-RUN yarn add pg
 ENV PATH /opt/node_modules/.bin:$PATH
 WORKDIR /opt/app
 COPY . .
 RUN yarn build
 
 # Creating final production image
-FROM node:20.12-alpine
-RUN apk add --no-cache vips-dev pg
-RUN yarn dev
-RUN yarn add pg
+FROM node:18-alpine
+RUN apk add --no-cache vips-dev
 ENV NODE_ENV=production
 WORKDIR /opt/
 COPY --from=build /opt/node_modules ./node_modules
