@@ -1,4 +1,4 @@
-FROM node:18-alpine as build
+FROM node:20.12-alpine as build
 RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git > /dev/null 2>&1
 ENV NODE_ENV=production
 
@@ -14,7 +14,7 @@ COPY . .
 RUN yarn build
 
 # Creating final production image
-FROM node:18-alpine
+FROM node:20.12-alpine
 RUN apk add --no-cache vips-dev pg
 RUN yarn dev
 RUN yarn add pg
