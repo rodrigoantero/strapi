@@ -6,6 +6,8 @@ WORKDIR /opt/
 COPY package.json yarn.lock ./
 RUN yarn global add node-gyp pg
 RUN yarn config set network-timeout 600000 -g && yarn install --production
+RUN yarn develop
+RUN yarn add pg
 ENV PATH /opt/node_modules/.bin:$PATH
 WORKDIR /opt/app
 COPY . .
@@ -14,6 +16,8 @@ RUN yarn build
 # Creating final production image
 FROM node:18-alpine
 RUN apk add --no-cache vips-dev pg
+RUN yarn develop
+RUN yarn add pg
 ENV NODE_ENV=production
 WORKDIR /opt/
 COPY --from=build /opt/node_modules ./node_modules
